@@ -1,0 +1,29 @@
+Ryujinx shader translator: room for Ampere constant banks c[18]..c[31].
+Maxwell has 18 constant buffers per stage and the translator sized its slot table to match; Ampere (SM86) encodes a 5-bit bank and
+NVN2 shaders use banks above 17 (Splatoon Raiders: c[0x18] in 8 vertex/fragment blocks, e.g. 4cd833221d53dd96, 1bd29c473dcc6e18), which
+threw IndexOutOfRangeException in GetConstantBufferBinding. The harness's StaticGpuAccessor gives those banks their own binding range.
+Applied at build time by translator/Ryujinx.Graphics.Shader.csproj to a copy under the build folder. The Ryujinx code in the context
+lines is MIT.
+--- a/Translation/ResourceManager.cs
++++ b/Translation/ResourceManager.cs
+@@ -65,7 +65,8 @@
+             _stage = stage;
+             _stagePrefix = GetShaderStagePrefix(stage);
+
+-            _cbSlotToBindingMap = new SetBindingPair[18];
++            // Ampere: 5-bit constant bank (c[0]..c[31]); Maxwell had 18.
++            _cbSlotToBindingMap = new SetBindingPair[32];
+             _sbSlotToBindingMap = new SetBindingPair[16];
+             _cbSlotToBindingMap.AsSpan().Fill(new(-1, -1));
+             _sbSlotToBindingMap.AsSpan().Fill(new(-1, -1));
+@@ -147,6 +148,10 @@
+
+         public int GetConstantBufferBinding(int slot)
+         {
++            if ((uint)slot >= (uint)_cbSlotToBindingMap.Length)
++            {
++                throw new InvalidOperationException($"constant bank {slot} is outside c[0]..c[{_cbSlotToBindingMap.Length - 1}]");
++            }
+             SetBindingPair setAndBinding = _cbSlotToBindingMap[slot];
+             if (setAndBinding.Binding < 0)
+             {

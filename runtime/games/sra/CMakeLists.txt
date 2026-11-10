@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+set(_sra "${CMAKE_CURRENT_SOURCE_DIR}")
+set(_rt "${PROJECT_SOURCE_DIR}")
+get_filename_component(_sra_recomp "${_rt}/../recomp" ABSOLUTE)
+include("${_sra_recomp}/cmake/GameManifest.cmake")
+game_manifest_load("${_sra_recomp}/games/sra/game.toml")
+set(_sra_gen "${CMAKE_CURRENT_BINARY_DIR}/gen")
+game_manifest_header("${_sra_gen}/game_manifest.h")
+set(_sra_includes "${_rt}/include" "${_rt}/games" "${_sra}" "${_sra_gen}")
+
+add_library(nxrt_game_sra_data STATIC "${_sra}/sra_data.cpp")
+target_include_directories(nxrt_game_sra_data PUBLIC ${_sra_includes})
+target_compile_features(nxrt_game_sra_data PUBLIC cxx_std_20)
+
+add_library(nxrt_game_sra_core STATIC "${_sra}/sra_core.cpp")
+target_link_libraries(nxrt_game_sra_core PUBLIC nxrt_game_sra_data nxrt)
+target_include_directories(nxrt_game_sra_core PUBLIC ${_sra_includes})
+target_compile_features(nxrt_game_sra_core PUBLIC cxx_std_20)
+
+if(TARGET nxrt_gfx)
+    add_library(nxrt_game_sra STATIC "${_sra}/sra_game.cpp")
+    target_link_libraries(nxrt_game_sra PUBLIC nxrt_game_sra_core nxrt_gfx)
+    target_include_directories(nxrt_game_sra PUBLIC ${_sra_includes} "${_rt}/src/gfx" "${_rt}/src/gfx/play" "${_rt}/src/testtools")
+    target_compile_features(nxrt_game_sra PUBLIC cxx_std_20)
+endif()

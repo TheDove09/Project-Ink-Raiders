@@ -1,0 +1,4 @@
+# hook sites of Raiders main 1.1.0
+# The frame boundary: sead's run loop f_71031b8c20 is `for (;;) this->vtable[0xE0](this)`, and that method (0x71031b8c60) runs once per
+# main-loop iteration on the main thread. Play mode pumps window events and samples keyboard / mouse / pads here (runtime games/sra/sra_game.cpp).
+entryhook 0x71031b8c60
