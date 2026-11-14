@@ -11,6 +11,21 @@ Keep the game dump and generated build artifacts local. Do not commit or package
 
 ## Current state
 
+**Latest (2026-11-14, multi-game: pipeline + launcher):**
+- **Pipeline** (`tools/pipeline`, see its README): `recomp_pipeline.py build <game.nup>` goes from a .nup to a playable folder in one
+  command, with JSON progress. Built-in profile for Raiders; any other title gets a generated `x<title id>` profile, frame hook
+  found by `frame_hook_scan.py`.
+  - Raiders from its .nup: 19 minutes, starts to the styled start menu, 60 fps.
+  - Mario Kart World (generated profile, frame hook 0x710069cbb0 "likely"): builds and links completely (191,459 functions in main),
+    loads all 5 modules, starts its services and mounts the 23 GB RomFS, then the SDK aborts 2.6 s in:
+    `nn::nlibsdk::heap::CentralHeap::Free` -> `nnmem_nlib_debug_break` (heap block check), called from main 0x7100a93580 right
+    after reading `System/HeapSize/Default.Nin_Ounce_NVN2.HeapDef.byml.zs`. Not caused by the host libc functions ([hle] libc =
+    false gives the same abort). Next: find which allocation is freed (main 0x7100ca8810 -> 0x7100a93580) and why its header is not
+    what nlib expects (heap setup from the HeapDef, alignment, or a memory/svc difference). Four MapSharedMemory refusals at random
+    addresses just before are the SDK's normal retries.
+- **Launcher** (`apps/launcher`, see its README): Tauri app; library from scan folders, Recompile with live stages and log, Play,
+  per-game settings, covers, controller navigation. Release exe: `apps/launcher/src-tauri/target/release/recomp-launcher.exe`.
+
 **Latest (2026-11-09, evening, milestones 104–107):**
 - **60 fps in play.**
   - Pipeline-key file appends moved off the render thread: no more 0.4–2 s freezes in new areas.

@@ -56,6 +56,9 @@ export function installMock() {
     open_path: () => null,
     set_cover: () => settings,
     read_build_log: () => 'No build log yet.',
+    get_game_settings: () => ({ window_mode: 'windowed', vsync: false, fps_limit: '60', render_scale: '100', operation_mode: 'handheld',
+      save_dir: '', save_dir_default: 'C:\\Users\\you\\AppData\\Roaming\\SplatoonRaidersNative\\save' }),
+    save_game_settings: (a) => ({ ...(a.settings as object) }),
     'plugin:event|listen': (a) => {
       const id = nextId++;
       (listeners[a.event as string] ??= new Map()).set(id, callbacks.get(a.handler as number) as Handler);

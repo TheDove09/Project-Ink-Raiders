@@ -136,6 +136,16 @@ button, input, select { font: inherit; color: inherit; }
 @keyframes pulse { 50% { box-shadow: 0 0 0 7px #60a5fa11; } }
 .error-box { margin-top: 16px; padding: 12px 14px; background: #7f1d1d44; color: #fecaca; border-radius: 10px; font-size: 13px; white-space: pre-wrap; }
 
+.game-settings { margin-top: 24px; background: var(--panel); border-radius: var(--radius); padding: 18px 22px; }
+.game-settings h3 { margin: 0 0 6px; }
+.gs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; align-items: end; }
+.gs-grid .span2 { grid-column: span 2; }
+.gs-grid .check { margin: 14px 0; }
+.check.inline { margin: 0; white-space: nowrap; }
+.field input[type='range'] { flex: 1; accent-color: var(--accent); padding: 0; border: 0; background: none; }
+.gs-actions { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 8px; }
+.ok-text { color: #86efac; font-size: 13px; margin-right: auto; }
+.err-text { color: #fca5a5; font-size: 13px; margin-right: auto; }
 .log-drawer { margin-top: 18px; }
 .log-toggle { background: none; border: 0; color: var(--dim); cursor: pointer; padding: 6px 0; }
 .log-toggle:hover { color: var(--text); }

@@ -3,6 +3,7 @@
 //! (tools/pipeline/recomp_pipeline.py) and playing.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod game_settings;
 mod jobs;
 mod library;
 mod nup;
@@ -146,13 +147,24 @@ fn read_build_log(state: State<AppState>, profile: String) -> String {
     lines[lines.len().saturating_sub(400)..].join("\n")
 }
 
+#[tauri::command]
+fn get_game_settings(game_dir: String) -> Result<game_settings::GameSettings, String> {
+    game_settings::load(&game_dir)
+}
+
+#[tauri::command]
+fn save_game_settings(game_dir: String, settings: game_settings::GameSettings) -> Result<game_settings::GameSettings, String> {
+    game_settings::save(&game_dir, &settings)?;
+    game_settings::load(&game_dir)
+}
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .manage(AppState { settings: Mutex::new(settings::load()), jobs: Arc::new(Mutex::new(jobs::Jobs::default())) })
         .invoke_handler(tauri::generate_handler![
             get_settings, save_settings, scan_library, add_paths, check_tools, start_build, cancel_build, job_status, play,
-            open_path, set_cover, read_build_log
+            open_path, set_cover, read_build_log, get_game_settings, save_game_settings
         ])
         .run(tauri::generate_context!())
         .expect("error while running the launcher");

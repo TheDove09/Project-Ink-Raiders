@@ -17,6 +17,9 @@ Tauri 2 (Rust backend, WebView2) with a React + TypeScript interface; about 10 M
 - **Storage**: a `.nup` on another drive is copied to the work folder (SSD) first; temporary build files are deleted afterwards unless
   "Keep temporary build files" is on; each game ends up in its own folder in the games folder.
 - **Play / Open folder / Set cover**: custom cover images are copied into `%LOCALAPPDATA%\RecompLauncher\covers`.
+- **Game settings** (built games): display (window / borderless / exclusive fullscreen), console mode (handheld / docked), frame cap,
+  VSync, resolution scale, save data folder. Written where the game reads them (`controls.ini` [display], `<profile>.ini` [am] / [fs]),
+  changing only those keys.
 - **Controller**: D-pad / left stick move between cards, A opens, B closes; arrow keys and Enter / Escape work too.
 
 Settings live in `%LOCALAPPDATA%\RecompLauncher\settings.json`.
@@ -37,4 +40,5 @@ working on the UI without the app.
 
 ## Not yet
 
-Automatic cover art and metadata, per-game settings (display mode, resolution, save folder), and an installer are later phases.
+Automatic cover art and metadata (NUPs carry no icon or name, so this needs an online source by title ID) and an installer.
+There is no OpenGL option: the runtime renders with Vulkan only.

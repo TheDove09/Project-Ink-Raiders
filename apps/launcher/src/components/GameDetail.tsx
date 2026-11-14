@@ -3,6 +3,7 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { api, formatSize, GameEntry, STAGES } from '../api';
 import type { BuildState } from '../App';
 import Cover from './Cover';
+import GameSettingsPanel from './GameSettingsPanel';
 import { overallProgress } from './GameCard';
 
 interface Props {
@@ -135,6 +136,8 @@ export default function GameDetail({ game, build, active, queued, onClose, onBui
             {failed && <div className="error-box">{build?.result?.error}</div>}
           </section>
         )}
+
+        {game.built && !active && <GameSettingsPanel gameDir={game.built.game_dir} />}
 
         <section className="log-drawer">
           <button className="log-toggle" onClick={() => setLogOpen((o) => !o)}>

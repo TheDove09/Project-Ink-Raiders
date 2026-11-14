@@ -380,8 +380,12 @@ def cmd_build(a) -> int:
             elif not os.path.exists(ini):
                 with open(ini, 'w', encoding='utf-8') as f:
                     f.write(GAME_INI.format(title=title))
+            import tomllib
+            with open(os.path.join(REPO, 'recomp', 'games', pid, 'game.toml'), 'rb') as f:
+                save_folder = tomllib.load(f)['files'].get('save_folder', pid)
             with open(os.path.join(game_dir, 'game.json'), 'w', encoding='utf-8') as f:
                 json.dump({'title': title, 'title_id': title_id, 'version': version, 'profile': pid, 'generated': not builtin,
+                           'save_folder': save_folder,
                            'exe': exe_name, 'frame_hook': summary.get('frame_hook'), 'source_nup': nup_path,
                            'built': time.strftime('%Y-%m-%dT%H:%M:%S')}, f, indent=1)
             # cleanup: the staged copy always; the build tree (generated C++, objects, libraries) unless --keep-temp

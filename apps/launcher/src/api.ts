@@ -15,6 +15,10 @@ export interface Settings {
 export interface Job { title_id: string; nup_path: string }
 export interface JobsView { current: Job | null; queue: Job[] }
 export interface ToolCheck { name: string; ok: boolean; detail: string }
+export interface GameSettings {
+  window_mode: string; vsync: boolean; fps_limit: string; render_scale: string;
+  operation_mode: string; save_dir: string; save_dir_default: string;
+}
 
 export type PipelineEvent =
   | { event: 'stage'; stage: string; label: string; index: number; count: number }
@@ -46,6 +50,8 @@ export const api = {
   openPath: (path: string) => invoke<void>('open_path', { path }),
   setCover: (titleId: string, image: string | null) => invoke<Settings>('set_cover', { titleId, image }),
   readBuildLog: (profile: string) => invoke<string>('read_build_log', { profile }),
+  getGameSettings: (gameDir: string) => invoke<GameSettings>('get_game_settings', { gameDir }),
+  saveGameSettings: (gameDir: string, settings: GameSettings) => invoke<GameSettings>('save_game_settings', { gameDir, settings }),
 };
 
 export function formatSize(bytes: number): string {
