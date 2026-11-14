@@ -20,9 +20,13 @@ Keep the game dump and generated build artifacts local. Do not commit or package
     loads all 5 modules, starts its services and mounts the 23 GB RomFS, then the SDK aborts 2.6 s in:
     `nn::nlibsdk::heap::CentralHeap::Free` -> `nnmem_nlib_debug_break` (heap block check), called from main 0x7100a93580 right
     after reading `System/HeapSize/Default.Nin_Ounce_NVN2.HeapDef.byml.zs`. Not caused by the host libc functions ([hle] libc =
-    false gives the same abort). Next: find which allocation is freed (main 0x7100ca8810 -> 0x7100a93580) and why its header is not
-    what nlib expects (heap setup from the HeapDef, alignment, or a memory/svc difference). Four MapSharedMemory refusals at random
-    addresses just before are the SDK's normal retries.
+    false gives the same abort). Four MapSharedMemory refusals at random addresses just before are the SDK's normal retries.
+    f_7100a93580 is a destructor of a stack object (x19 = 0x7e000ffd28): it calls `member96->vtable[3](member96)`, and that call goes
+    through an rtld import stub (f_7700002400) straight into sdk `CentralHeap::Free(0x79c5b00120)`, which rejects the block. A
+    virtual slot that lands on an imported SDK function points at load-time symbol binding (MKW is the first title with a second
+    subsdk, subsdk1) or at an object made by another allocator. Next: log what member96's vtable slot 3 holds and which relocation
+    wrote it (runtime loader, cross-module ABS64/GLOB_DAT binding), and compare the object's constructor (f_7100a935e0 allocates
+    0x68 bytes via f_71003e3550).
 - **Launcher** (`apps/launcher`, see its README): Tauri app; library from scan folders, Recompile with live stages and log, Play,
   per-game settings, covers, controller navigation. Release exe: `apps/launcher/src-tauri/target/release/recomp-launcher.exe`.
 
