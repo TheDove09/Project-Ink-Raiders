@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+set(_@ID@ "${CMAKE_CURRENT_SOURCE_DIR}")
+set(_rt "${PROJECT_SOURCE_DIR}")
+get_filename_component(_@ID@_recomp "${_rt}/../recomp" ABSOLUTE)
+include("${_@ID@_recomp}/cmake/GameManifest.cmake")
+game_manifest_load("${_@ID@_recomp}/games/@ID@/game.toml")
+set(_@ID@_gen "${CMAKE_CURRENT_BINARY_DIR}/gen")
+game_manifest_header("${_@ID@_gen}/game_manifest.h")
+set(_@ID@_includes "${_rt}/include" "${_rt}/games" "${_@ID@}" "${_@ID@_gen}")
+
+add_library(nxrt_game_@ID@_data STATIC "${_@ID@}/@ID@_data.cpp")
+target_include_directories(nxrt_game_@ID@_data PUBLIC ${_@ID@_includes})
+target_compile_features(nxrt_game_@ID@_data PUBLIC cxx_std_20)
+
+add_library(nxrt_game_@ID@_core STATIC "${_@ID@}/@ID@_core.cpp")
+target_link_libraries(nxrt_game_@ID@_core PUBLIC nxrt_game_@ID@_data nxrt)
+target_include_directories(nxrt_game_@ID@_core PUBLIC ${_@ID@_includes})
+target_compile_features(nxrt_game_@ID@_core PUBLIC cxx_std_20)
+
+if(TARGET nxrt_gfx)
+    add_library(nxrt_game_@ID@ STATIC "${_@ID@}/@ID@_game.cpp")
+    target_link_libraries(nxrt_game_@ID@ PUBLIC nxrt_game_@ID@_core nxrt_gfx)
+    target_include_directories(nxrt_game_@ID@ PUBLIC ${_@ID@_includes} "${_rt}/src/gfx" "${_rt}/src/gfx/play" "${_rt}/src/testtools")
+    target_compile_features(nxrt_game_@ID@ PUBLIC cxx_std_20)
+endif()
