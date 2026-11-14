@@ -115,11 +115,14 @@ bool file_exists(const std::string& p) {
     return !p.empty() && std::filesystem::is_regular_file(p, ec);
 }
 
-// The game files the port runs from: the ExeFS main module and the RomFS (with the font archive the menu reads).
+// The game files the port runs from: the ExeFS main module and a non-empty RomFS. Any game (the menu's styled look additionally
+// needs Raiders' font and layout archives, and falls back to the plain look without them).
 bool game_files_present() {
     const std::string exefs = config_get_str("fs", "exefs", "");
     const std::string romfs = services::romfs_dir();
-    return file_exists(exefs + "/main") && file_exists(romfs + "/Font/Font.Nin_Ounce_NVN2.bfarc.zs");
+    std::error_code ec;
+    return file_exists(exefs + "/main") && !romfs.empty() && std::filesystem::is_directory(romfs, ec) &&
+           std::filesystem::directory_iterator(romfs, ec) != std::filesystem::directory_iterator();
 }
 
 std::string pick_file(const wchar_t* title, const wchar_t* filter) {
