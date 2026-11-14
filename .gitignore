@@ -35,3 +35,6 @@ __pycache__/
 # generated game profiles (tools/pipeline/profile_gen.py): made on each PC from the player's own dump
 recomp/games/x*/
 runtime/games/x*/
+# launcher app build output
+apps/launcher/dist/
+apps/launcher/src-tauri/gen/
